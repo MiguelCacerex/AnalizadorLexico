@@ -1,35 +1,50 @@
+def es_alpha(caracter):
+    alfabeto = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    return caracter in alfabeto
+
+
 def tipo_identificador(entrada):
-    lexemas = []
-    i = 0
+    lexemas = []  # Lista para almacenar los lexemas encontrados
+    i = 0  # Variable de índice para recorrer la cadena de entrada
 
     while i < len(entrada):
-        if entrada[i].isalpha() or entrada[i] == '_':
-            inicio = i
-            es_valido = True
-            contador = 0
+        # Verifica si es el comienzo de una palabra o si el carácter actual no es alfabético
+        if i == 0 or entrada[i-1] == ' ' or entrada[i-1] == '\n':
+            if entrada[i] == '$':  # Verifica si el carácter actual es '$'
+                inicio = i  # Guarda la posición inicial del identificador
+                contador = 0  # Contador para el tamaño del identificador
+                i += 1  # Avanza al siguiente carácter
 
-            while i < len(entrada) and (entrada[i].isalnum() or entrada[i] == '_') and contador < 10:
-                i += 1
-                contador += 1
+                # Verifica si el siguiente carácter es alfabético y cuenta los caracteres del identificador
+                if i < len(entrada) and es_alpha(entrada[i]):
+                    contador += 1
+                    i += 1
 
-            fin = i
+                    while i < len(entrada) and contador <= 10:
+                        # Verifica si el carácter actual no es espacio o salto de línea y cuenta los caracteres
+                        if entrada[i] == ' ' or entrada[i] == '\n':
+                            break
+                        contador += 1
+                        i += 1
+                    fin = i  # Guarda la posición final del identificador
 
-            lexema = entrada[inicio:fin]
-
-            if contador > 0 and es_valido:
-                lexemas.append(('IDENTIFICADOR', lexema, inicio, fin - 1))
+                    # Verifica si el identificador cumple con las condiciones y está seguido por un espacio o salto de línea
+                    if (i == len(entrada) or entrada[i] == ' ' or entrada[i] == '\n') and contador >= 2 and contador <= 10:
+                        lexema = entrada[inicio:i]  # Extrae el identificador
+                        # Agrega el identificador a la lista de lexemas
+                        lexemas.append(
+                            ('IDENTIFICADOR', lexema, inicio, fin - 1))
+                    else:
+                        while i < len(entrada) and entrada[i] != ' ':
+                            i += 1  # Avanza hasta el siguiente espacio si el identificador no es válido
+                else:
+                    i += 1  # Avanza al siguiente carácter si no es un carácter alfabético
+            else:
+                i += 1  # Avanza al siguiente carácter si no es el inicio de un identificador
         else:
-            i += 1
+            i += 1  # Avanza al siguiente carácter si no es el inicio de una palabra
 
     if not lexemas:
-        return 'DESCONOCIDO', entrada, 0, len(entrada) - 1
+        return []  # Si no se encontraron identificadores, retorna una lista vacía
     else:
-        return lexemas
-
-
-# Ejemplo de uso
-cadena = "abc _variable123 invalid_id _another_long_id_here_12345"
-resultados = tipo_identificador(cadena)
-
-for tipo, lexema, inicio, fin in resultados:
-    print(f"Lexema: {lexema}, Tipo: {tipo}, Posición: {inicio}-{fin}")
+        return lexemas  # Retorna la lista de lexemas encontrados

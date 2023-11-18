@@ -4,27 +4,31 @@ def es_operador_aritmetico(caracter):
 
 
 def tipo_operador_aritmetico(entrada):
-    lexemas = []
-    i = 0
+    lexemas = []  # Lista para almacenar los lexemas encontrados
+    i = 0  # Variable de índice para recorrer la cadena de entrada
 
     while i < len(entrada):
+        # Verifica si el carácter actual es un operador aritmético
         if entrada[i] in ('+', '-', '*', '/', '%'):
-            inicio = i
-            lexema = entrada[i]
-            lexemas.append(('OPERADOR_ARITMETICO', lexema, inicio, inicio))
-            i += 1
+            if (i+1) < len(entrada) and entrada[i+1] != '=' and (entrada[i+1] != '+' or entrada[i+1] != '-'):
+                # Verifica si el siguiente carácter no es '=' y no es una secuencia de operadores '++' o '--'
+                inicio = i  # Guarda la posición inicial del operador aritmético
+                lexema = entrada[i]  # Extrae el operador aritmético
+                # Agrega el operador a la lista de lexemas
+                lexemas.append(('OPERADOR_ARITMETICO', lexema, inicio, inicio))
+                i += 1
+                break
+            elif (i+1) == len(entrada):
+                # Si el operador está al final de la cadena
+                inicio = i
+                lexema = entrada[i]
+                lexemas.append(('OPERADOR_ARITMETICO', lexema, inicio, inicio))
+                i += 1
+            i += 1  # Avanza al siguiente carácter
         else:
-            i += 1
+            i += 1  # Avanza al siguiente carácter si no es un operador aritmético
 
     if not lexemas:
-        return 'DESCONOCIDO', entrada, 0, len(entrada) - 1
+        return []  # Si no se encontraron operadores aritméticos, retorna una lista vacía
     else:
-        return lexemas
-
-
-# Ejemplo de uso
-cadena = "5 + 3 * 2 - 7 / 4"
-resultados = tipo_operador_aritmetico(cadena)
-
-for tipo, lexema, inicio, fin in resultados:
-    print(f"Lexema: {lexema}, Tipo: {tipo}, Posición: {inicio}-{fin}")
+        return lexemas  # Retorna la lista de lexemas encontrados
